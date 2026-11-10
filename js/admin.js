@@ -69,7 +69,7 @@
       }).join("") + '</div></section></div>' +
       '<div class="dashboard-grid"><section class="card"><div class="card-head"><div><h3>Attendance overview</h3><p>Weekly attendance summary</p></div><div class="chart-legend"><span>Present</span><span class="legend-green">Absent</span></div></div><div class="chart-wrap"><canvas id="attendance-chart" aria-label="Attendance statistics chart"></canvas></div></section>' +
       '<section class="card"><div class="card-head"><div><h3>Upcoming examinations</h3><p>Academic calendar</p></div><button class="icon-btn" data-nav="results" aria-label="View examinations">→</button></div><div class="activity-list">' +
-      Store.get("exams").map(function (exam) { return '<div class="activity-item"><span class="activity-mark"></span><div><strong>' + esc(exam.name) + '</strong><small>' + esc(exam.className) + ' · ' + esc(formatDate(exam.date)) + '</small></div></div>'; }).join("") +
+      Store.get("exams").map(function (exam) { return '<div class="activity-item"><span class="activity-mark"></span><div><strong>' + esc(exam.name) + ' <span class="badge">' + esc(exam.type || "Exam") + '</span></strong><small>' + esc(exam.className) + (exam.subject ? ' · ' + esc(exam.subject) : "") + ' · ' + esc(formatDate(exam.date)) + (exam.teacherName ? ' · By ' + esc(exam.teacherName) : "") + '</small></div></div>'; }).join("") +
       '</div></section></div><div class="section-head"><div><h2>Recently enrolled students</h2><p>Latest student records</p></div><button class="btn btn-light" data-nav="students">View all students</button></div>' +
       '<div class="table-wrap"><table class="table"><thead><tr><th>Student</th><th>Student ID</th><th>Class</th><th>Guardian</th><th>Contact</th></tr></thead><tbody>' +
       students.slice(-4).reverse().map(function (item) { return '<tr><td><div class="person"><div class="avatar">' + initials(item.name) + '</div><div><strong>' + esc(item.name) + '</strong><small>' + esc(item.email || "Student") + '</small></div></div></td><td>' + esc(item.id) + '</td><td>' + esc(item.className) + ' · ' + esc(item.section) + '</td><td>' + esc(item.guardian) + '</td><td>' + esc(item.guardianPhone) + '</td></tr>'; }).join("") +
@@ -79,9 +79,11 @@
     const teacher = user.role === "teacher" ? Store.get("teachers").find(function (item) { return item.id === user.id; }) : null;
     const student = user.role === "student" ? Store.get("students").find(function (item) { return item.id === user.id; }) : null;
     let rows = Store.get("timetable");
-    if (teacher) rows = rows.filter(function (row) { return row.teacher === teacher.name; });
+    if (teacher) rows = rows.filter(function (row) { return row.teacherId ? row.teacherId === teacher.id : row.teacher === teacher.name; });
     if (student) rows = rows.filter(function (row) { return row.className === student.className && row.section === student.section; });
-    return '<div class="toolbar"><div class="toolbar-left"><select id="timetable-filter" aria-label="Filter timetable by class"><option value="">All classes</option>' + Store.get("classes").map(function (item) { return '<option>' + esc(item.name) + '</option>'; }).join("") + '</select></div>' +
+    const filterClasses = teacher ? teacher.classes.split(",").map(function (item) { return item.trim(); }) : Store.get("classes").map(function (item) { return item.name; });
+    const filter = user.role === "student" ? "" : '<div class="toolbar-left"><select id="timetable-filter" aria-label="Filter timetable by class"><option value="">All classes</option>' + Store.get("classes").filter(function (item) { return !teacher || filterClasses.indexOf(item.name) !== -1; }).map(function (item) { return '<option>' + esc(item.name) + '</option>'; }).join("") + '</select></div>';
+    return '<div class="toolbar">' + filter +
       (user.role === "admin" ? '<div class="toolbar-right"><button class="btn" data-action="add-timetable">＋ Add timetable slot</button></div>' : "") + '</div>' +
       '<div class="section-head"><div><h2>Weekly timetable</h2><p>' + (teacher ? "Your assigned teaching schedule" : student ? "Your class schedule" : "Class and teacher schedule overview") + '</p></div></div>' +
       (rows.length ? '<div class="table-wrap"><table class="timetable"><thead><tr><th>Day</th><th>Time</th><th>Class</th><th>Subject</th><th>Teacher</th><th>Room</th></tr></thead><tbody>' +

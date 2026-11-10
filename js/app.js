@@ -319,9 +319,19 @@
         operation === "edit" ? (entity === "students" || entity === "teachers" ? "Update the details below. Leave the password blank to keep the current one." : "Review and update the details below.") : "Information is saved locally in this browser.", fields, values, action, id);
       return;
     }
-    if (action === "new-exam") openModal("Create examination", "Add an assessment to the school calendar.", [
-      ["name", "Examination name", "text", true], ["className", "Class", "select:classes", true], ["date", "Examination date", "date", true], ["maxMarks", "Maximum marks", "number", true]
-    ], { maxMarks: "100" }, action);
+    if (action === "new-exam") {
+      const activeUser = Auth.current();
+      const teacher = activeUser && activeUser.role === "teacher" ? Store.get("teachers").find(function (item) { return item.id === activeUser.id; }) : null;
+      const fields = [
+        ["name", "Assessment name", "text", true],
+        ["type", "Assessment type", "select:exam-types", true],
+        ["className", teacher ? "Assigned class" : "Class", teacher ? "select:teacher-classes" : "select:classes", true],
+        ["subject", "Subject", teacher ? "select:teacher-subjects" : "select:subjects", !!teacher],
+        ["date", "Examination date", "date", true],
+        ["maxMarks", "Maximum marks", "number", true]
+      ];
+      openModal("Create examination", "Schedule an exam or quiz for one of your classes.", fields, { type: "Exam", maxMarks: "100" }, action);
+    }
     else if (action === "add-result" || action === "edit-result") {
       const record = action === "edit-result" ? Store.get("results").find(function (item) { return item.id === id; }) : null;
       openModal(action === "edit-result" ? "Edit student marks" : "Enter student marks", "Grades and pass status are calculated from the marks entered.", [
@@ -345,7 +355,7 @@
     ], { date: Store.today }, action);
     else if (action === "add-timetable") openModal("Add timetable slot", "Add a class to the weekly schedule.", [
       ["className", "Class", "select:classes", true], ["section", "Section", "select:sections", true], ["day", "Day", "select:days", true], ["time", "Start time", "time", true],
-      ["subject", "Subject", "select:subjects", true], ["teacher", "Teacher name", "text", true], ["room", "Room number", "text", true]
+      ["subject", "Subject", "select:subjects", true], ["teacherId", "Teacher", "select:teachers", true], ["room", "Room number", "text", true]
     ], { day: "Monday" }, action);
     else if (action === "change-password") openModal("Change password", "Use a password you have not used elsewhere.", [
       ["currentPassword", "Current password", "password", true], ["newPassword", "New password (at least 6 characters)", "password", true], ["confirmPassword", "Confirm new password", "password", true]
@@ -368,6 +378,19 @@
       const assigned = teacher ? teacher.classes.split(",").map(function (item) { return item.trim(); }) : [];
       return '<div class="field"><label for="modal-' + name + '">' + esc(label) + '</label><select id="modal-' + name + '" name="' + name + '" required><option value="">Select an assigned class</option>' + Store.get("classes").filter(function (item) { return assigned.indexOf(item.name) !== -1; }).map(function (item) { return '<option ' + (current === item.name ? "selected" : "") + '>' + esc(item.name) + '</option>'; }).join("") + '</select></div>';
     }
+    if (type === "select:teacher-subjects") {
+      const user = Auth.current();
+      const teacher = user && user.role === "teacher" ? Store.get("teachers").find(function (item) { return item.id === user.id; }) : null;
+      const subjects = Store.get("subjects").filter(function (item) { return teacher && (item.teacher === teacher.name || item.name === teacher.subject); });
+      if (teacher && !subjects.some(function (item) { return item.name === teacher.subject; })) subjects.push({ name: teacher.subject });
+      return '<div class="field"><label for="modal-' + name + '">' + esc(label) + '</label><select id="modal-' + name + '" name="' + name + '" required><option value="">Select a subject</option>' + subjects.map(function (item) { return '<option ' + (current === item.name ? "selected" : "") + '>' + esc(item.name) + '</option>'; }).join("") + '</select></div>';
+    }
+    if (type === "select:teachers") {
+      return '<div class="field"><label for="modal-' + name + '">' + esc(label) + '</label><select id="modal-' + name + '" name="' + name + '" required><option value="">Select a teacher</option>' + Store.get("teachers").map(function (item) { return '<option value="' + esc(item.id) + '" ' + (current === item.id ? "selected" : "") + '>' + esc(item.name) + '</option>'; }).join("") + '</select></div>';
+    }
+    if (type === "select:exam-types") {
+      return '<div class="field"><label for="modal-' + name + '">' + esc(label) + '</label><select id="modal-' + name + '" name="' + name + '" required>' + ["Exam", "Quiz"].map(function (item) { return '<option ' + (current === item ? "selected" : "") + '>' + item + '</option>'; }).join("") + '</select></div>';
+    }
     if (type === "select:classes") return '<div class="field"><label for="modal-' + name + '">' + esc(label) + '</label><select id="modal-' + name + '" name="' + name + '" ' + (required ? "required" : "") + '><option value="">Select a class</option>' + Store.get("classes").map(function (item) { return '<option ' + (current === item.name ? "selected" : "") + '>' + esc(item.name) + '</option>'; }).join("") + '</select></div>';
     if (type === "select:sections") {
       const cls = Store.get("classes").find(function (item) { return item.name === (values && values.className); });
@@ -388,7 +411,7 @@
       const teacher = active && active.role === "teacher" ? Store.get("teachers").find(function (item) { return item.id === active.id; }) : null;
       const options = Store.get("subjects").filter(function (item) { return !teacher || item.teacher === teacher.name || item.name === teacher.subject; });
       if (teacher && !options.some(function (item) { return item.name === teacher.subject; })) options.push({ name: teacher.subject });
-      return '<div class="field"><label for="modal-' + name + '">' + esc(label) + '</label><select id="modal-' + name + '" name="' + name + '" required><option value="">Select subject</option>' + options.map(function (item) { return '<option ' + (current === item.name ? "selected" : "") + '>' + esc(item.name) + '</option>'; }).join("") + '</select></div>';
+      return '<div class="field"><label for="modal-' + name + '">' + esc(label) + '</label><select id="modal-' + name + '" name="' + name + '" ' + (required ? "required" : "") + '><option value="">Select subject</option>' + options.map(function (item) { return '<option ' + (current === item.name ? "selected" : "") + '>' + esc(item.name) + '</option>'; }).join("") + '</select></div>';
     }
     return '<div class="field ' + (field[4] ? "wide" : "") + '"><label for="modal-' + name + '">' + esc(label) + '</label><input id="modal-' + name + '" name="' + name + '" type="' + type + '" value="' + (type === "file" ? "" : esc(current)) + '" ' + (required ? "required" : "") + (field[5] ? ' minlength="' + field[5] + '"' : "") + (type === "file" ? ' accept="image/*"' : "") + (name === "password" && !required ? ' placeholder="Leave blank to keep current password"' : "") + '></div>';
   }
@@ -469,8 +492,33 @@
     if (/^(add|edit)-(students|teachers|classes|subjects)$/.test(action)) {
       saveEntity(action, id, values);
     } else if (action === "new-exam") {
-      values.id = Store.nextId("EX-", Store.get("exams")); Store.get("exams").push(values); Store.set("exams", Store.get("exams"));
-      Store.activity("Examination scheduled: " + values.name); toast("Examination created.", "success");
+      const activeUser = Auth.current();
+      const teacher = activeUser.role === "teacher" ? Store.get("teachers").find(function (item) { return item.id === activeUser.id; }) : null;
+      const assignedClasses = teacher ? teacher.classes.split(",").map(function (item) { return item.trim(); }) : [];
+      const assignedSubjects = teacher ? Store.get("subjects").filter(function (item) { return item.teacher === teacher.name; }).map(function (item) { return item.name; }) : [];
+      if (teacher && assignedSubjects.indexOf(teacher.subject) === -1) assignedSubjects.push(teacher.subject);
+      const examClass = Store.get("classes").find(function (item) { return item.name === values.className; });
+      const maxMarks = Number(values.maxMarks);
+      if (!examClass || (teacher && assignedClasses.indexOf(values.className) === -1)) {
+        toast("You can only schedule assessments for your assigned classes.", "error");
+        return;
+      }
+      if (teacher && assignedSubjects.indexOf(values.subject) === -1) {
+        toast("You can only schedule assessments for your assigned subjects.", "error");
+        return;
+      }
+      if (!values.name.trim() || !["Exam", "Quiz"].includes(values.type) || !values.date || !Number.isFinite(maxMarks) || maxMarks <= 0) {
+        toast("Enter a name, type, date and valid maximum marks for the assessment.", "error");
+        return;
+      }
+      values.id = Store.nextId("EX-", Store.get("exams"));
+      values.maxMarks = String(maxMarks);
+      values.createdBy = teacher ? teacher.id : activeUser.id;
+      values.teacherName = teacher ? teacher.name : "";
+      Store.get("exams").push(values);
+      Store.set("exams", Store.get("exams"));
+      Store.activity((values.type === "Quiz" ? "Quiz" : "Examination") + " scheduled: " + values.name);
+      toast(values.type + " created and added to the school calendar.", "success");
     } else if (action === "add-result" || action === "edit-result") {
       const student = Store.get("students").find(function (item) { return item.id === values.studentId; });
       const marks = Number(values.marks), max = Number(values.maxMarks);
@@ -513,7 +561,17 @@
       const notices = Store.get("notices"); notices.push({ id: Store.nextId("NOT-", notices), title: values.title, date: values.date, description: values.description, important: !!values.important, author: Auth.current().name });
       Store.set("notices", notices); Store.activity("Announcement published: " + values.title); toast("Announcement published.", "success");
     } else if (action === "add-timetable") {
-      const rows = Store.get("timetable"); rows.push(Object.assign({ id: Store.nextId("TT-", rows) }, values));
+      const rows = Store.get("timetable");
+      const classRecord = Store.get("classes").find(function (item) { return item.name === values.className; });
+      const section = String(values.section || "").trim();
+      const teacher = Store.get("teachers").find(function (item) { return item.id === values.teacherId; });
+      if (!classRecord || classRecord.sections.split(",").map(function (item) { return item.trim().toLowerCase(); }).indexOf(section.toLowerCase()) === -1 || !teacher) {
+        toast("Choose a valid class, section and teacher for the timetable slot.", "error");
+        return;
+      }
+      values.section = section;
+      values.teacher = teacher.name;
+      rows.push(Object.assign({ id: Store.nextId("TT-", rows) }, values));
       Store.set("timetable", rows); toast("Timetable slot added.", "success");
     } else if (action === "change-password") {
       const user = Auth.current();
@@ -615,8 +673,9 @@
     if (!user) return false;
     const adminOnly = /^(add|edit|delete)-(teachers|classes|subjects|notice)$/.test(action) ||
       /^(edit|delete)-students$/.test(action) ||
-      ["new-exam", "add-fee", "pay-fee", "fee-receipt", "add-notice", "add-timetable", "export-students", "export-teachers", "export-classes", "export-subjects", "export-fees", "view-student"].indexOf(action) !== -1;
+      ["add-fee", "pay-fee", "fee-receipt", "add-notice", "add-timetable", "export-students", "export-teachers", "export-classes", "export-subjects", "export-fees", "view-student"].indexOf(action) !== -1;
     if (adminOnly && user.role !== "admin") return false;
+    if (action === "new-exam" && user.role !== "admin" && user.role !== "teacher") return false;
     if (action === "add-students" && user.role !== "admin" && user.role !== "teacher") return false;
     if (user.role === "student" && ["add-result", "edit-result", "delete-result", "export-results", "save-attendance", "attendance-all-present", "export-attendance"].indexOf(action) !== -1) return false;
     if (user.role !== "admin" && user.role !== "teacher" && ["add-result", "edit-result", "delete-result", "export-results", "save-attendance", "attendance-all-present", "export-attendance"].indexOf(action) !== -1) return false;

@@ -12,6 +12,7 @@
     const results = Store.get("results").filter(function (row) { return row.studentId === student.id; });
     const average = results.length ? Math.round(results.reduce(function (sum, row) { return sum + Number(row.marks) / Number(row.maxMarks || 100) * 100; }, 0) / results.length) : 0;
     const schedule = Store.get("timetable").filter(function (row) { return row.className === student.className && row.section === student.section; });
+    const upcomingExams = Store.get("exams").filter(function (exam) { return exam.className === student.className && exam.date >= Store.today; }).sort(function (a, b) { return a.date.localeCompare(b.date); });
     const classTeacher = AdminViews.studentTeacher(student);
     const announcements = Store.get("notices").slice(0, 2);
     return '<div class="card profile-banner"><div class="avatar">' + (student.photo ? '<img src="' + esc(student.photo) + '" alt="">' : initials(student.name)) + '</div><div><h2>Good morning, ' + esc(student.name.split(" ")[0]) + '</h2><p>' + esc(student.id) + ' · ' + esc(student.className) + ' · Section ' + esc(student.section) + ' · Roll ' + esc(student.roll) + (classTeacher ? ' · Class teacher: ' + esc(classTeacher) : '') + '</p></div><button class="btn btn-light" data-nav="profile" style="margin-left:auto">My profile</button></div>' +
@@ -23,7 +24,13 @@
       }).join("") : '<div class="empty-state">Your examination results will appear here.</div>') + '</div></section>' +
       '<section class="card"><div class="card-head"><div><h3>School announcements</h3><p>Latest news from your school</p></div><button class="text-action" data-nav="notices">All notices →</button></div><div class="activity-list">' +
       announcements.map(function (notice) { return '<div class="activity-item"><span class="activity-mark"></span><div><strong>' + esc(notice.title) + '</strong><small>' + esc(formatDate(notice.date)) + '</small></div></div>'; }).join("") +
-      '</div></section></div><div class="section-head"><div><h2>Your weekly timetable</h2><p>' + esc(student.className) + ' · Section ' + esc(student.section) + '</p></div><button class="btn btn-light" data-nav="timetable">Full timetable</button></div>' +
+      '</div></section></div><div class="section-head"><div><h2>Upcoming exams & quizzes</h2><p>Assessments scheduled for ' + esc(student.className) + '</p></div></div>' +
+      (upcomingExams.length ? '<div class="notice-list">' + upcomingExams.map(function (exam) {
+        const examDate = new Date(exam.date + "T00:00:00");
+        const weekday = Number.isNaN(examDate.getTime()) ? "" : examDate.toLocaleDateString("en-IN", { weekday: "long" });
+        return '<article class="card notice-card student-exam-card"><div class="student-exam-date"><strong>' + esc(weekday || formatDate(exam.date)) + '</strong><span>' + esc(formatDate(exam.date)) + '</span></div><div class="student-exam-info"><h3>' + esc(exam.name) + '</h3><div class="notice-meta"><span class="badge">' + esc(exam.type || "Exam") + '</span>' + (exam.subject ? '<span>' + esc(exam.subject) + '</span>' : "") + '<span>Maximum ' + esc(exam.maxMarks) + ' marks</span>' + (exam.teacherName ? '<span>By ' + esc(exam.teacherName) + '</span>' : "") + '</div></div></article>';
+      }).join("") + '</div>' : '<div class="card empty-state"><strong>No upcoming exams</strong>Your class assessments will appear here when scheduled.</div>') +
+      '<div class="section-head"><div><h2>Your weekly timetable</h2><p>' + esc(student.className) + ' · Section ' + esc(student.section) + '</p></div><button class="btn btn-light" data-nav="timetable">Full timetable</button></div>' +
       (schedule.length ? '<div class="table-wrap"><table class="table"><thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Teacher</th><th>Room</th></tr></thead><tbody>' +
         schedule.map(function (row) { return '<tr><td>' + esc(row.day) + '</td><td>' + esc(row.time) + '</td><td><strong>' + esc(row.subject) + '</strong></td><td>' + esc(row.teacher) + '</td><td>' + esc(row.room) + '</td></tr>'; }).join("") + '</tbody></table></div>' :
         '<div class="card empty-state">Your class timetable has not been published yet.</div>');

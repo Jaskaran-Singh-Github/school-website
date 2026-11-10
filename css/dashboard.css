@@ -52,6 +52,13 @@
 .notice-card h3 { margin:0 0 7px;font:700 13px Manrope,sans-serif; }
 .notice-card p { margin:0 0 10px;color:#6f7d92;font-size:11px;line-height:1.6; }
 .notice-meta { display:flex;gap:12px;color:#9aa6b8;font-size:9px; }
+.student-exam-card { display:flex;align-items:center;gap:18px;padding:17px 20px; }
+.student-exam-card:before { top:15px;bottom:15px; }
+.student-exam-date { flex:none;display:grid;min-width:118px;gap:4px;padding:10px 12px;border:1px solid #dfe6ff;border-radius:11px;background:linear-gradient(145deg,#fff,#edf1ff);box-shadow:0 3px 0 #dce4fb,0 5px 10px #4263eb10; }
+.student-exam-date strong { color:#3556ca;font-size:11px; }
+.student-exam-date span { color:var(--muted);font-size:10px; }
+.student-exam-info { min-width:0; }
+.student-exam-info .notice-meta { flex-wrap:wrap;align-items:center; }
 .attendance-marking { display:grid;gap:10px; }
 .attendance-row { display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border:1px solid #e8ecf3;border-radius:12px;background:linear-gradient(150deg,#fff,#fafbfe);box-shadow:0 4px 12px #25375308,0 2px 0 #e9edf4;transition:transform .18s,box-shadow .18s; }
 .attendance-row:hover { transform:translateY(-2px);box-shadow:0 9px 18px #25375310,0 2px 0 #e9edf4; }
@@ -91,6 +98,8 @@
 .dark .table td { border-color:#28344a;color:#c5cede; }
 .dark .table tbody tr:hover td,.dark .activity-item:hover { background:#202d42; }
 .dark .badge { background:linear-gradient(180deg,#202d42,#1a2639);border-color:#344158;color:#aab6cb;box-shadow:none; }
+.dark .student-exam-date { background:linear-gradient(145deg,#293960,#202d48);border-color:#34476d;box-shadow:0 3px 0 #17233a,0 5px 10px #00000020; }
+.dark .student-exam-date strong { color:#b6c4ff; }
 .dark .activity-mark { border-color:#1b2840;box-shadow:0 0 0 4px #273553,0 2px 5px #00000040; }
 .dark .choice-group span { background:linear-gradient(180deg,#202d42,#1a2639);box-shadow:0 2px 0 #111b2b; }
 .dark .choice-group .status-present input:checked+span { background:linear-gradient(145deg,#1d4539,#18392f);border-color:#326b55;color:#82ddb0;box-shadow:0 3px 0 #142f28,0 5px 9px #00000020; }
@@ -102,4 +111,8 @@
 .dark .progress-track { background:linear-gradient(180deg,#111b2b,#1a2639);border-color:#344158; }
 @media (prefers-reduced-motion:reduce) {
   .card,.activity-item,.attendance-row,.table td { transition:none; }
+}
+@media (max-width:480px) {
+  .student-exam-card { align-items:flex-start;gap:12px;padding:15px 16px; }
+  .student-exam-date { min-width:96px;padding:9px; }
 }
