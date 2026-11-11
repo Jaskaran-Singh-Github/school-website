@@ -8,6 +8,8 @@
 @media (max-width:760px) {
   .login-screen { grid-template-columns:1fr; }
   .login-story { display:none; }
+  .login-panel { padding:32px 18px; }
+  .login-card { padding:28px 24px 24px; }
   .sidebar { transform:translateX(-100%);width:260px;box-shadow:12px 0 28px #15233a17; }
   .sidebar.open { transform:translateX(0); }
   .main-area { width:100%;margin-left:0; }
@@ -26,6 +28,8 @@
   .toolbar-right .btn { flex:1; }
 }
 @media (max-width:480px) {
+  .login-panel { padding:22px 14px; }
+  .login-card { padding:25px 20px 21px;border-radius:20px; }
   .stat-grid { gap:9px; }
   .stat-card { padding:13px; }
   .stat-value { font-size:23px;margin-top:11px; }

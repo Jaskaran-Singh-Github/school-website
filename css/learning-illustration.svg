@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 400" fill="none">
+  <defs>
+    <linearGradient id="bookBlue" x1="120" y1="250" x2="350" y2="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#88D6FF"/>
+      <stop offset="1" stop-color="#3989F4"/>
+    </linearGradient>
+    <linearGradient id="bookPurple" x1="116" y1="293" x2="375" y2="351" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B9A5FF"/>
+      <stop offset="1" stop-color="#8064E8"/>
+    </linearGradient>
+    <linearGradient id="bookCoral" x1="142" y1="231" x2="365" y2="283" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFB39E"/>
+      <stop offset="1" stop-color="#F47782"/>
+    </linearGradient>
+    <linearGradient id="page" x1="164" y1="155" x2="312" y2="266" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDF8"/>
+      <stop offset="1" stop-color="#DDEAFF"/>
+    </linearGradient>
+    <linearGradient id="pencil" x1="371" y1="158" x2="406" y2="273" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE889"/>
+      <stop offset="1" stop-color="#FFB84D"/>
+    </linearGradient>
+    <linearGradient id="cap" x1="94" y1="115" x2="175" y2="162" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#354C9F"/>
+      <stop offset="1" stop-color="#202F70"/>
+    </linearGradient>
+    <filter id="shadow" x="48" y="58" width="392" height="330" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="12"/>
+      <feGaussianBlur stdDeviation="10"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix values="0 0 0 0 0.07 0 0 0 0 0.12 0 0 0 0 0.35 0 0 0 0.28 0"/>
+      <feBlend in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+    <style>
+      .book-stack { transform-box:fill-box;transform-origin:center;animation:book-float 5s ease-in-out infinite; }
+      .pencil { transform-box:fill-box;transform-origin:center;animation:pencil-float 4.5s ease-in-out infinite; }
+      .cap { transform-box:fill-box;transform-origin:center;animation:cap-float 4s ease-in-out infinite; }
+      .spark { transform-box:fill-box;transform-origin:center;animation:sparkle 2.8s ease-in-out infinite; }
+      .spark:nth-of-type(2n) { animation-delay:1s; }
+      @keyframes book-float { 0%,100% { transform:translateY(0) rotate(-1deg); } 50% { transform:translateY(-7px) rotate(1deg); } }
+      @keyframes pencil-float { 0%,100% { transform:translateY(0) rotate(0); } 50% { transform:translateY(-8px) rotate(4deg); } }
+      @keyframes cap-float { 0%,100% { transform:translateY(0) rotate(-2deg); } 50% { transform:translateY(-9px) rotate(2deg); } }
+      @keyframes sparkle { 0%,100% { opacity:.55;transform:scale(.8); } 50% { opacity:1;transform:scale(1.15); } }
+      @media (prefers-reduced-motion:reduce) { *,*:before,*:after { animation:none!important; } }
+    </style>
+  </defs>
+
+  <ellipse cx="244" cy="332" rx="157" ry="27" fill="#192B75" opacity=".22"/>
+  <circle cx="241" cy="218" r="151" fill="#B5D8FF" opacity=".12"/>
+
+  <g class="spark" fill="#FFF2A8">
+    <path d="m344 91 5 13 13 5-13 5-5 13-5-13-13-5 13-5 5-13Z"/>
+    <path d="m104 203 3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z" opacity=".9"/>
+  </g>
+  <g class="spark" fill="#fff">
+    <path d="m278 76 3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z" opacity=".85"/>
+    <circle cx="82" cy="260" r="3" opacity=".75"/>
+    <circle cx="382" cy="228" r="3" opacity=".8"/>
+  </g>
+
+  <g class="cap" filter="url(#shadow)">
+    <path d="m83 123 61-28 68 26-65 32-64-30Z" fill="#89A8FF"/>
+    <path d="m83 123 64 30v17l-63-31-1-16Z" fill="url(#cap)"/>
+    <path d="m147 153 65-32v18l-65 31v-17Z" fill="#263875"/>
+    <path d="m115 139 33-15 35 14-34 16-34-15Z" fill="#F8FBFF" opacity=".94"/>
+    <path d="M200 119v35" stroke="#FFD873" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="200" cy="158" r="5" fill="#FFD873"/>
+  </g>
+
+  <g class="book-stack" filter="url(#shadow)">
+    <path d="m113 292 211-44 66 28-213 47-64-31Z" fill="#DCD3FF"/>
+    <path d="m177 323 213-47v24l-213 49v-26Z" fill="url(#bookPurple)"/>
+    <path d="m113 292 64 31v26l-64-34v-23Z" fill="#7057CF"/>
+    <path d="m122 268 215-43 50 22-213 47-52-26Z" fill="#FFD1C2"/>
+    <path d="m174 294 213-47v24l-213 47v-24Z" fill="url(#bookCoral)"/>
+    <path d="m122 268 52 26v24l-52-26v-24Z" fill="#E66E7C"/>
+    <path d="m136 241 188-40 54 23-204 44-38-27Z" fill="#C5EFFF"/>
+    <path d="m174 268 204-44v23l-204 45v-24Z" fill="url(#bookBlue)"/>
+    <path d="m136 241 38 27v24l-38-27v-24Z" fill="#438FE1"/>
+    <path d="m193 273 164-36" stroke="#E8F7FF" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    <path d="m190 301 169-38" stroke="#FFF0E8" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    <path d="m190 331 171-39" stroke="#EAE4FF" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+  </g>
+
+  <g class="book-stack">
+    <path d="M147 196c28-14 56-17 91-6v74c-31-12-61-10-91 8v-76Z" fill="#F2F6FF"/>
+    <path d="M238 190c34-12 63-8 91 6v76c-30-18-60-20-91-8v-74Z" fill="url(#page)"/>
+    <path d="M147 196c28-14 56-17 91-6v74c-31-12-61-10-91 8v-76Z" stroke="#C9D8F4" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M238 190c34-12 63-8 91 6v76c-30-18-60-20-91-8v-74Z" stroke="#C9D8F4" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M238 191v73" stroke="#B6C8E7" stroke-width="3"/>
+    <path d="m163 207 55-10m-55 20 55-10m-55 20 55-10m36-10 53 10m-53 1 53 10m-53 1 53 10" stroke="#92A9D1" stroke-width="3" stroke-linecap="round" opacity=".6"/>
+    <path d="M154 269c28-16 56-18 84-7l-8 9c-27-9-50-6-76 9v-11Zm84-7c30-11 55-9 83 7v11c-28-15-51-18-76-9l-7-9Z" fill="#FFCF6E"/>
+  </g>
+
+  <g class="pencil" filter="url(#shadow)" transform="rotate(22 382 192)">
+    <rect x="368" y="148" width="20" height="116" rx="9" fill="url(#pencil)"/>
+    <path d="M368 160a10 10 0 0 1 20 0v9h-20v-9Z" fill="#FF8D79"/>
+    <path d="m368 255 10 18 10-18h-20Z" fill="#F3C994"/>
+    <path d="m375 268 3 5 3-5h-6Z" fill="#34416F"/>
+    <path d="M374 181v54" stroke="#FFF4BE" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+  </g>
+</svg>
