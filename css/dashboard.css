@@ -1,11 +1,12 @@
 .stat-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:20px; }
-.card { min-width:0;border:1px solid #e8ecf3;border-radius:16px;background:linear-gradient(150deg,#fff,#fbfcff);box-shadow:var(--shadow);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease; }
-.card:hover { transform:translateY(-3px);border-color:#dfe5f2;box-shadow:var(--shadow-raised); }
+.card { min-width:0;border:1px solid #e8ecf3;border-radius:16px;background:linear-gradient(150deg,#fff,#fbfcff);box-shadow:var(--shadow);transform-style:preserve-3d;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s ease,border-color .25s ease; }
+.card:hover { transform:perspective(900px) rotateX(1.5deg) translateY(-4px) translateZ(8px);border-color:#dfe5f2;box-shadow:var(--shadow-raised); }
 .stat-card { position:relative;padding:19px 20px;overflow:hidden;isolation:isolate; }
 .stat-card:before { content:"";position:absolute;z-index:-1;top:-42px;right:-35px;width:125px;height:125px;border-radius:50%;background:radial-gradient(circle,#eef2ff 0,rgba(238,242,255,.55) 42%,transparent 72%);pointer-events:none; }
 .stat-card:after { content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(145deg,#ffffffb8 0%,transparent 38%);pointer-events:none; }
 .stat-top { display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11px;font-weight:600; }
-.stat-icon { display:grid;place-items:center;width:36px;height:36px;border:1px solid #e2e8ff;border-radius:11px;background:linear-gradient(145deg,#fff,#e9eeff);color:var(--blue);font-size:16px;box-shadow:0 4px 0 #dce4ff,0 7px 12px #4263eb18,inset 0 1px #fff; }
+.stat-icon { display:grid;place-items:center;width:36px;height:36px;border:1px solid #e2e8ff;border-radius:11px;background:linear-gradient(145deg,#fff,#e9eeff);color:var(--blue);font-size:16px;box-shadow:0 4px 0 #dce4ff,0 7px 12px #4263eb18,inset 0 1px #fff;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s; }
+.stat-card:hover .stat-icon { transform:translateY(-3px) rotateY(18deg) rotateX(8deg);box-shadow:0 6px 0 #dce4ff,0 11px 16px #4263eb24,inset 0 1px #fff; }
 .stat-value { display:block;margin:15px 0 5px;font:800 29px Manrope,sans-serif;letter-spacing:-1.1px;text-shadow:0 1px #fff; }
 .stat-note { color:#9aa6b8;font-size:10px; }
 .stat-note .positive { color:var(--green);font-weight:700; }
