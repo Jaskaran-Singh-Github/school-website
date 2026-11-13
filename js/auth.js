@@ -44,6 +44,17 @@
     catch (error) { console.error("Could not save the login session.", error); return false; }
     return true;
   }
+  function loginAny(identity, password) {
+    const email = normalizedEmail(identity);
+    const accountId = String(identity || "").trim().toLowerCase();
+    const roles = [];
+    if (Store.get("adminAccounts").some(function (item) { return normalizedEmail(item.email) === email; })) roles.push("admin");
+    if (Store.get("teachers").some(function (item) { return normalizedEmail(item.email) === email; })) roles.push("teacher");
+    if (Store.get("students").some(function (item) {
+      return normalizedEmail(item.email) === email || String(item.id).toLowerCase() === accountId;
+    })) roles.push("student");
+    return roles.length === 1 && login(roles[0], identity, password);
+  }
   function registerAdmin(name, email, password) {
     const normalizedEmail = email.trim().toLowerCase();
     const validation = validRegistration({ name: name, email: normalizedEmail, password: password, confirmPassword: password });
@@ -138,5 +149,5 @@
     catch (error) { console.error("Could not read the active user session.", error); logout(); return null; }
   }
   function logout() { localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY); }
-  window.Auth = { login: login, registerAdmin: registerAdmin, registerTeacher: registerTeacher, registerStudent: registerStudent, resetPassword: resetPassword, current: current, logout: logout };
+  window.Auth = { login: login, loginAny: loginAny, registerAdmin: registerAdmin, registerTeacher: registerTeacher, registerStudent: registerStudent, resetPassword: resetPassword, current: current, logout: logout };
 })();

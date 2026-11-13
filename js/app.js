@@ -69,7 +69,7 @@
 
   function roleName(role) { return role.charAt(0).toUpperCase() + role.slice(1); }
   function demoCredentials(role) {
-    if (role === "admin") {
+    if (role === "admin" || role === "any") {
       const account = Store.get("adminAccounts").find(function (item) { return item.email.toLowerCase() === "admin@northstar.edu"; });
       return ["admin@northstar.edu", Store.get("settings").adminPassword || account && account.password || "admin123"];
     }
@@ -85,19 +85,19 @@
     loginRole = role;
     authView = "login";
     const demo = demoCredentials(role);
-    const identityLabel = role === "student" ? "Email address or Student ID" : "Email address";
-    app.innerHTML = '<div class="login-screen"><section class="login-story"><div class="brand"><span class="brand-mark">✦</span>Northstar <span style="font-weight:500;opacity:.72">Academy</span></div>' + learningArtwork + '<div class="story-copy"><span class="eyebrow">A brighter way to learn</span><h1>Everything school, in one place.</h1><p>Bring your school community together with a thoughtful, connected experience for students, teachers, and administrators.</p></div><div class="story-foot">© 2026 Northstar Academy · Learn. Grow. Thrive.</div></section><section class="login-panel"><div class="login-card"><div class="eyebrow">Welcome to Northstar</div><h2>Sign in to your portal</h2><p class="login-subtitle">Choose your account type to continue.</p><div class="role-picker">' +
-      ["admin", "teacher", "student"].map(function (item) { return '<button class="role-option ' + (role === item ? "active" : "") + '" type="button" data-role="' + item + '">' + (item === "admin" ? "◇" : item === "teacher" ? "♧" : "♙") + " " + roleName(item) + '</button>'; }).join("") +
-      '</div><form id="login-form" novalidate><div class="field"><label for="identity">' + identityLabel + '</label><input id="identity" name="identity" autocomplete="username" required placeholder="' + (role === "student" ? "student@school.edu or student ID" : "name@northstar.edu") + '"></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password"></div><div id="login-error" class="login-error">' + esc(errorText || "") + '</div><button class="btn btn-block" type="submit">Sign in to ' + roleName(role) + ' portal <span>→</span></button></form><div class="auth-links"><button class="text-action" type="button" data-action="forgot-password">Forgot password?</button><a href="' + (role === "admin" ? "signup.html" : role === "teacher" ? "signup-teacher.html" : "signup-student.html") + '">Create ' + (role === "admin" ? "an administrator" : "a " + role) + ' account</a></div><div class="demo-box"><strong>DEMO ACCOUNT <button class="text-action" type="button" data-demo="' + role + '" style="float:right">Use demo login →</button></strong><div class="demo-credentials"><span><span>' + (role === "student" ? "Student ID" : "Email address") + '</span><b>' + demo[0] + '</b></span><span><span>Password</span><b>' + demo[1] + '</b></span></div></div></div></section></div>';
+    const identityLabel = role === "student" || role === "any" ? "Email address or Student ID" : "Email address";
+    app.innerHTML = '<div class="login-screen"><section class="login-story"><div class="brand"><span class="brand-mark">✦</span>Northstar <span style="font-weight:500;opacity:.72">Academy</span></div>' + learningArtwork + '<div class="story-copy"><span class="eyebrow">A brighter way to learn</span><h1>Everything school, in one place.</h1><p>Bring your school community together with a thoughtful, connected experience for students, teachers, and administrators.</p></div><div class="story-foot">© 2026 Northstar Academy · Learn. Grow. Thrive.</div></section><section class="login-panel"><div class="login-card"><div class="eyebrow">Welcome to Northstar</div><h2>Sign in</h2><p class="login-subtitle">Enter your account details to continue.</p><form id="login-form" novalidate><div class="field"><label for="identity">' + identityLabel + '</label><input id="identity" name="identity" autocomplete="username" required placeholder="' + (role === "student" ? "student@school.edu or student ID" : role === "any" ? "name@northstar.edu or student ID" : "name@northstar.edu") + '"></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password"></div><div id="login-error" class="login-error">' + esc(errorText || "") + '</div><button class="btn btn-block" type="submit">Sign in <span>→</span></button></form><div class="auth-links"><button class="text-action" type="button" data-action="forgot-password">Forgot password?</button><a href="signup.html">Create account</a></div><div class="demo-box"><strong>DEMO ACCOUNT <button class="text-action" type="button" data-demo="' + role + '" style="float:right">Use demo login →</button></strong><div class="demo-credentials"><span><span>' + (role === "student" ? "Student ID" : "Email address") + '</span><b>' + demo[0] + '</b></span><span><span>Password</span><b>' + demo[1] + '</b></span></div></div></div></section></div>';
   }
   function renderSignup(errorText, selectedRole) {
     const role = selectedRole || document.body.dataset.loginRole || "admin";
     loginRole = role;
     authView = "signup";
+    document.title = roleName(role) + " Registration — Northstar";
     const classes = Store.get("classes");
     const classOptions = '<option value="">Select a class</option>' + classes.map(function (item) { return '<option value="' + esc(item.name) + '">' + esc(item.name) + '</option>'; }).join("");
     const commonFields = '<div class="field"><label for="signup-name">Full name</label><input id="signup-name" name="name" autocomplete="name" required minlength="2" placeholder="Your name"></div><div class="field"><label for="signup-email">Email address</label><input id="signup-email" name="email" type="email" autocomplete="email" required placeholder="you@school.edu"></div>';
     const passwordFields = '<div class="field"><label for="signup-password">Password</label><input id="signup-password" name="password" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters"></div><div class="field"><label for="signup-confirm">Confirm password</label><input id="signup-confirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Re-enter your password"></div>';
+    const roleSelector = '<div class="field"><label for="signup-role">Which account would you like to create?</label><select id="signup-role" name="role" required><option value="admin"' + (role === "admin" ? " selected" : "") + '>Admin</option><option value="teacher"' + (role === "teacher" ? " selected" : "") + '>Teacher</option><option value="student"' + (role === "student" ? " selected" : "") + '>Student</option></select></div>';
     let fields = commonFields;
     let heading = "Administrator registration";
     let description = "Create an administrator account to manage the school. Your unique email can only be registered once.";
@@ -110,7 +110,7 @@
       description = "Create your student portal account with your school enrollment details.";
       fields += '<div class="field"><label for="signup-student-id">Student ID</label><input id="signup-student-id" name="studentId" required placeholder="For example, STU-2042"></div><div class="field"><label for="signup-class">Class</label><select id="signup-class" name="className" required>' + classOptions + '</select></div><div class="field"><label for="signup-section">Section</label><select id="signup-section" name="section" required><option value="">Select a class first</option></select></div><div class="field"><label for="signup-roll">Roll number</label><input id="signup-roll" name="roll" required placeholder="Your roll number"></div><div class="field"><label for="signup-guardian-phone">Parent / guardian phone</label><input id="signup-guardian-phone" name="guardianPhone" type="tel" autocomplete="tel" required placeholder="Parent or guardian phone"></div>';
     }
-    app.innerHTML = '<div class="login-screen"><section class="login-story"><div class="brand"><span class="brand-mark">✦</span>Northstar <span style="font-weight:500;opacity:.72">Academy</span></div><div class="story-copy"><span class="eyebrow">A connected school community</span><h1>Your school. Your space.</h1><p>' + esc(description) + '</p></div><div class="story-foot">© 2026 Northstar Academy · Learn. Grow. Thrive.</div></section><section class="login-panel"><div class="login-card"><div class="eyebrow">' + heading + '</div><h2>Create your account</h2><p class="login-subtitle">' + esc(description) + '</p><form id="signup-form" novalidate>' + fields + passwordFields + '<div id="signup-error" class="login-error">' + esc(errorText || "") + '</div><button class="btn btn-block" type="submit">Create ' + role + ' account <span>→</span></button></form><div class="auth-links"><a href="' + (role === "admin" ? "admin.html" : role === "teacher" ? "teacher.html" : "student.html") + '">← Back to sign in</a></div><div class="demo-box"><strong>Already registered?</strong><div class="demo-credentials">Sign in with your existing email and password. Duplicate email and school ID registrations are not allowed.</div></div></div></section></div>';
+    app.innerHTML = '<div class="login-screen"><section class="login-story"><div class="brand"><span class="brand-mark">✦</span>Northstar <span style="font-weight:500;opacity:.72">Academy</span></div><div class="story-copy"><span class="eyebrow">A connected school community</span><h1>Your school. Your space.</h1><p>' + esc(description) + '</p></div><div class="story-foot">© 2026 Northstar Academy · Learn. Grow. Thrive.</div></section><section class="login-panel"><div class="login-card"><div class="eyebrow">' + heading + '</div><h2>Create your account</h2><p class="login-subtitle">' + esc(description) + '</p><form id="signup-form" novalidate>' + roleSelector + fields + passwordFields + '<div id="signup-error" class="login-error">' + esc(errorText || "") + '</div><button class="btn btn-block" type="submit">Create ' + role + ' account <span>→</span></button></form><div class="auth-links"><a href="' + (role === "admin" ? "admin.html" : role === "teacher" ? "teacher.html" : "student.html") + '">← Back to sign in</a></div><div class="demo-box"><strong>Already registered?</strong><div class="demo-credentials">Sign in with your existing email and password. Duplicate email and school ID registrations are not allowed.</div></div></div></section></div>';
     if (role === "student") {
       const classSelect = document.getElementById("signup-class");
       if (classSelect) classSelect.value = "";
@@ -119,10 +119,13 @@
   function renderForgot(role, errorText) {
     loginRole = role;
     authView = "forgot";
-    const identityLabel = role === "student" ? "Student email address" : "Account email address";
-    app.innerHTML = '<div class="login-screen"><section class="login-story"><div class="brand"><span class="brand-mark">✦</span>Northstar <span style="font-weight:500;opacity:.72">Academy</span></div><div class="story-copy"><span class="eyebrow">Account recovery</span><h1>Back to your school day.</h1><p>Set a new password for an account saved in this browser.</p></div><div class="story-foot">© 2026 Northstar Academy · Learn. Grow. Thrive.</div></section><section class="login-panel"><div class="login-card"><div class="eyebrow">Forgot password</div><h2>Reset your password</h2><p class="login-subtitle">Select your portal and enter the email on your account.</p><div class="role-picker">' +
-      ["admin", "teacher", "student"].map(function (item) { return '<button class="role-option ' + (role === item ? "active" : "") + '" type="button" data-role="' + item + '">' + roleName(item) + '</button>'; }).join("") +
-      '</div><form id="forgot-form" novalidate><input type="hidden" name="role" value="' + role + '"><div class="field"><label for="forgot-email">' + identityLabel + '</label><input id="forgot-email" name="email" type="email" autocomplete="email" required placeholder="name@northstar.edu"></div><div class="field"><label for="forgot-password">New password</label><input id="forgot-password" name="password" type="password" minlength="8" autocomplete="new-password" required placeholder="At least 8 characters"></div><div class="field"><label for="forgot-confirm">Confirm new password</label><input id="forgot-confirm" name="confirmPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="Re-enter your password"></div><div class="login-error" id="forgot-error">' + esc(errorText || "") + '</div><button class="btn btn-block" type="submit">Save new password</button></form><p class="recovery-note">Browser-only recovery changes the password in local data; it does not verify account ownership by email.</p><div class="auth-links"><button class="text-action" data-action="back-to-login" type="button">← Back to sign in</button></div></div></section></div>';
+    const identityLabel = role === "any" ? "Account email address" : role === "student" ? "Student email address" : "Account email address";
+    const recoveryHeading = role === "any" ? "Account recovery" : roleName(role) + " account recovery";
+    const recoverySubtitle = role === "any" ? "Choose your account type and enter its email address." : "Enter the email address for your " + roleName(role) + " account.";
+    const roleField = role === "any" ?
+      '<div class="field"><label for="forgot-role">Account type</label><select id="forgot-role" name="role" required><option value="">Select an account type</option><option value="admin">Admin</option><option value="teacher">Teacher</option><option value="student">Student</option></select></div>' :
+      '<input type="hidden" name="role" value="' + role + '">';
+    app.innerHTML = '<div class="login-screen"><section class="login-story"><div class="brand"><span class="brand-mark">✦</span>Northstar <span style="font-weight:500;opacity:.72">Academy</span></div><div class="story-copy"><span class="eyebrow">Account recovery</span><h1>Back to your school day.</h1><p>Set a new password for an account saved in this browser.</p></div><div class="story-foot">© 2026 Northstar Academy · Learn. Grow. Thrive.</div></section><section class="login-panel"><div class="login-card"><div class="eyebrow">' + recoveryHeading + '</div><h2>Reset your password</h2><p class="login-subtitle">' + recoverySubtitle + '</p><form id="forgot-form" novalidate>' + roleField + '<div class="field"><label for="forgot-email">' + identityLabel + '</label><input id="forgot-email" name="email" type="email" autocomplete="email" required placeholder="name@northstar.edu"></div><div class="field"><label for="forgot-password">New password</label><input id="forgot-password" name="password" type="password" minlength="8" autocomplete="new-password" required placeholder="At least 8 characters"></div><div class="field"><label for="forgot-confirm">Confirm new password</label><input id="forgot-confirm" name="confirmPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="Re-enter your password"></div><div class="login-error" id="forgot-error">' + esc(errorText || "") + '</div><button class="btn btn-block" type="submit">Save new password</button></form><p class="recovery-note">Browser-only recovery changes the password in local data; it does not verify email ownership.</p><div class="auth-links"><button class="text-action" data-action="back-to-login" type="button">← Back to sign in</button></div></div></section></div>';
   }
   function navItems(user) {
     return navConfig[user.role].map(function (item) {
@@ -146,7 +149,7 @@
   }
   function renderApp() {
     const user = Auth.current();
-    if (!user) { renderLogin("admin"); return; }
+    if (!user) { renderLogin(document.body.dataset.loginRole || "admin"); return; }
     if (!navConfig[user.role].some(function (item) { return item[0] === page; })) page = "dashboard";
     const title = page === "fees" && user.role === "student" ? ["My fees", "Review your fee balance and recorded payments."] : pageTitles[page] || pageTitles.dashboard;
     const body = pageContent(user);
@@ -689,7 +692,10 @@
     if (action === "close-modal") { overlay.hidden = true; return; }
     if (action === "forgot-password") { renderForgot(loginRole); return; }
     if (action === "back-to-login") { renderLogin(loginRole); return; }
-    if (action === "logout") { Auth.logout(); page = "dashboard"; renderLogin("admin"); return; }
+    if (action === "logout") {
+      const role = document.body.dataset.loginRole === "any" ? "any" : active ? active.role : "admin";
+      Auth.logout(); page = "dashboard"; renderLogin(role); return;
+    }
     if (action === "mobile-menu") { const sidebar = document.getElementById("sidebar"); sidebar.classList.toggle("open"); return; }
     if (action === "mobile-search") {
       const search = document.querySelector(".search-wrap");
@@ -791,10 +797,11 @@
       toast("Password reset. Sign in with your new password.", "success");
     } else if (event.target.id === "login-form") {
       event.preventDefault();
-      const role = document.querySelector(".role-option.active").dataset.role;
       const identity = event.target.elements.identity.value.trim();
       const password = event.target.elements.password.value;
-      if (!Auth.login(role, identity, password)) { document.getElementById("login-error").textContent = "We couldn't verify those details. Please try again."; return; }
+      const authenticated = loginRole === "any" ? Auth.loginAny(identity, password) : Auth.login(loginRole, identity, password);
+      if (!authenticated) { document.getElementById("login-error").textContent = "We couldn't verify those details. Please try again."; return; }
+      const role = loginRole === "any" ? Auth.current().role : loginRole;
       page = "dashboard"; renderApp(); toast("Welcome to your " + role + " portal.", "success");
     } else if (event.target.id === "modal-form") {
       event.preventDefault(); submitModal(event.target).catch(function (error) { console.error("Could not save this form.", error); toast("The form could not be saved.", "error"); });
@@ -811,6 +818,17 @@
     }
   });
   document.addEventListener("change", function (event) {
+    if (event.target.id === "signup-role" && event.target.value !== loginRole) {
+      const form = event.target.form;
+      const sharedValues = ["name", "email", "password", "confirmPassword"].map(function (name) {
+        return form.elements[name].value;
+      });
+      renderSignup(undefined, event.target.value);
+      ["signup-name", "signup-email", "signup-password", "signup-confirm"].forEach(function (id, index) {
+        document.getElementById(id).value = sharedValues[index];
+      });
+      return;
+    }
     if (["attendance-class", "attendance-section", "attendance-date", "attendance-month"].indexOf(event.target.id) !== -1) Attendance.refresh();
     if (event.target.name === "className") {
       const sectionSelect = document.querySelector('#modal-form [name="section"], #signup-form [name="section"]');
